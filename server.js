@@ -136,6 +136,7 @@ app.post('/submit-feedback', async (req, res) => {
 // Feedback Form Page (Opens when customer scans QR Code)
 app.get('/feedback/:advisorId', async (req, res) => {
     try {
+        const RENDER_BACKEND_URL = "https://qr-feedback-system-backend-czm2.onrender.com"; // ✅ Use Render's backend
         const { advisorId } = req.params;
 
         if (!mongoose.Types.ObjectId.isValid(advisorId)) {
@@ -147,7 +148,7 @@ app.get('/feedback/:advisorId', async (req, res) => {
             return res.status(404).json({ message: 'Advisor not found' });
         }
 
-        // Use the Full API URL for Submitting Feedback
+        // ✅ Ensure the feedback form submits to Render
         res.send(`
             <html>
             <head>
@@ -163,7 +164,7 @@ app.get('/feedback/:advisorId', async (req, res) => {
             </head>
             <body>
                 <h2>Provide Feedback for ${advisor.name}</h2>
-                <form action="http://${LOCAL_IP}:${PORT}/submit-feedback" method="POST">
+                <form action="${RENDER_BACKEND_URL}/submit-feedback" method="POST">
                     <input type="hidden" name="advisorId" value="${advisor._id}" />
                     
                     <label for="rating">Rate the Service (1-5):</label>
