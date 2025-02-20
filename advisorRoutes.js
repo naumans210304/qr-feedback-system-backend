@@ -33,19 +33,20 @@ if (!fs.existsSync(QR_CODE_DIR)) {
     console.log('Created directory for storing QR codes.');
 }
 
-// Function to Generate QR Code with Updated IP
+// Function to Generate QR Code with Render URL
 const generateQRCode = async (advisorId) => {
     try {
         const qrCodePath = path.join(QR_CODE_DIR, `${advisorId}.png`);
-        const qrCodeURL = `http://${LOCAL_IP}:5000/qrcodes/${advisorId}.png`;
+        const renderBackendURL = "https://qr-feedback-system-backend-czm2.onrender.com"; // ✅ Use Render URL
+        const qrCodeURL = `${renderBackendURL}/qrcodes/${advisorId}.png`;
 
-        // Always regenerate QR Code to ensure the latest IP is used
-        await QRCode.toFile(qrCodePath, `http://${LOCAL_IP}:5000/feedback/${advisorId}`);
-        console.log(`Generated new QR Code for ${advisorId}: ${qrCodeURL}`);
+        // Always regenerate QR Code with Render URL
+        await QRCode.toFile(qrCodePath, `${renderBackendURL}/feedback/${advisorId}`);
+        console.log(`✅ Generated new QR Code for ${advisorId}: ${qrCodeURL}`);
 
         return qrCodeURL;
     } catch (error) {
-        console.error("Error generating QR Code:", error);
+        console.error("❌ Error generating QR Code:", error);
         return null;
     }
 };

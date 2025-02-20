@@ -70,29 +70,34 @@ app.use('/qrcodes', express.static(QR_CODE_DIR, {
     }
 }));
 
-// Generate QR Code for an Advisor
+// Generate QR Code for an Advisor (Using Render Backend URL)
 const updateAllQRCodes = async () => {
     try {
+        const RENDER_BACKEND_URL = "https://qr-feedback-system-backend-czm2.onrender.com"; // Use live backend URL
         const advisors = await Advisor.find({}); // Fetch all advisors
 
         for (const advisor of advisors) {
             const qrCodePath = path.join(QR_CODE_DIR, `${advisor._id}.png`);
-            const newQRCodeURL = `http://${LOCAL_IP}:${PORT}/qrcodes/${advisor._id}.png`;
+            const newQRCodeURL = `${RENDER_BACKEND_URL}/qrcodes/${advisor._id}.png`;
 
-            // Always regenerate QR Code to ensure the latest IP is used
-            await QRCode.toFile(qrCodePath, `http://${LOCAL_IP}:${PORT}/feedback/${advisor._id}`);
+            // Always regenerate QR Code with the Render Backend URL
+            await QRCode.toFile(qrCodePath, `${RENDER_BACKEND_URL}/feedback/${advisor._id}`);
 
             // Update MongoDB if the QR Code is outdated
             if (advisor.qrCode !== newQRCodeURL) {
                 advisor.qrCode = newQRCodeURL;
                 await advisor.save(); // Save the updated QR Code to the database
-                console.log(`Updated QR Code for ${advisor.name}: ${newQRCodeURL}`);
+                console.log(`✅ Updated QR Code for ${advisor.name}: ${newQRCodeURL}`);
             }
         }
+        console.log("🎉 All QR Codes Updated Successfully!");
     } catch (error) {
-        console.error("Error updating QR Codes:", error);
+        console.error("❌ Error updating QR Codes:", error);
     }
 };
+
+// Run this function once when the server starts
+updateAllQRCodes();
 
 // Submit Feedback API (Handles Form Submission)
 app.post('/submit-feedback', async (req, res) => {
